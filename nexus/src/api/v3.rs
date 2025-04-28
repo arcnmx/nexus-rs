@@ -25,14 +25,17 @@ use super::{
     },
     wnd_proc::{RawWndProcAddRem, RawWndProcSendToGame},
 };
-use windows::Win32::Graphics::{Direct3D11::ID3D11Device, Dxgi::IDXGISwapChain};
+use windows::{
+    core::InterfaceRef,
+    Win32::Graphics::{Direct3D11::ID3D11Device, Dxgi::IDXGISwapChain},
+};
 
 /// Nexus addon API (version 3).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AddonApi {
     /// DirectX swap chain.
-    pub swap_chain: IDXGISwapChain,
+    pub swap_chain: Option<InterfaceRef<'static, IDXGISwapChain>>,
 
     /// ImGui context.
     pub imgui_context: *mut imgui::sys::ImGuiContext,
@@ -197,6 +200,7 @@ impl AddonApi {
     /// Retrieves the DirectX 11 device associated with the swap chain.
     #[inline]
     pub fn get_d3d11_device(&self) -> Option<ID3D11Device> {
-        unsafe { self.swap_chain.GetDevice() }.ok()
+        let swap_chain = self.swap_chain.as_ref()?;
+        unsafe { swap_chain.GetDevice() }.ok()
     }
 }

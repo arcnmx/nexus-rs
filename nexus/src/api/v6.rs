@@ -38,14 +38,17 @@ use super::{
     updater::RawRequestUpdate,
     wnd_proc::{RawWndProcAddRem, RawWndProcSendToGame},
 };
-use windows::Win32::Graphics::{Direct3D11::ID3D11Device, Dxgi::IDXGISwapChain};
+use windows::{
+  core::InterfaceRef,
+  Win32::Graphics::{Direct3D11::ID3D11Device, Dxgi::IDXGISwapChain},
+};
 
 /// Nexus addon API (version 6).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AddonApi {
     /// DirectX swap chain.
-    pub swap_chain: IDXGISwapChain,
+    pub swap_chain: Option<InterfaceRef<'static, IDXGISwapChain>>,
 
     /// ImGui context.
     pub imgui_context: *mut imgui::sys::ImGuiContext,
@@ -115,11 +118,12 @@ impl AddonApi {
     /// Retrieves the DirectX 11 device associated with the swap chain.
     #[inline]
     pub fn get_d3d11_device(&self) -> Option<ID3D11Device> {
-        unsafe { self.swap_chain.GetDevice() }.ok()
+        let swap_chain = self.swap_chain.as_ref()?;
+        unsafe { swap_chain.GetDevice() }.ok()
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct RendererApi {
     /// Registers a new render callback.
@@ -129,7 +133,7 @@ pub struct RendererApi {
     pub deregister: RawGuiRemRender,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct UiApi {
     /// Sends a text alert to the user visible for a short amount of time.
@@ -142,7 +146,7 @@ pub struct UiApi {
     pub deregister_close_on_escape: RawGuiDeregisterCloseOnEscape,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct PathApi {
     /// Returns the path to the game directory.
@@ -161,7 +165,7 @@ pub struct PathApi {
     pub get_common_dir: RawGetCommonDir,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct MinHookApi {
     /// MinHook create.
@@ -177,7 +181,7 @@ pub struct MinHookApi {
     pub disable: RawHookDisable,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct EventApi {
     /// Raises an event to all subscribing addons.
@@ -203,7 +207,7 @@ pub struct EventApi {
     pub unsubscribe: RawEventSubscribe,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct WndProcApi {
     /// Registers a new [WNDPROC](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nc-winuser-wndproc) callback.
@@ -216,7 +220,7 @@ pub struct WndProcApi {
     pub send_to_game_only: RawWndProcSendToGame,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct InputBindsApi {
     /// Trigger a keybind programmatically.
@@ -236,7 +240,7 @@ pub struct InputBindsApi {
     pub deregister: RawKeybindDeregister,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct GameBindApi {
     /// Presses the keys of a given bind.
@@ -258,7 +262,7 @@ pub struct GameBindApi {
     pub is_bound: RawGamebindIsBound,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct DataLinkApi {
     /// Returns a pointer to the requested resource of `null` if it does not exist.
@@ -268,7 +272,7 @@ pub struct DataLinkApi {
     pub share: RawDataShareResource,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct TextureApi {
     /// Returns a pointer to the [`Texture`](crate::texture::Texture) or `null` if it does not exist.
@@ -299,7 +303,7 @@ pub struct TextureApi {
     pub load_from_memory: RawTextureLoadFromMemory,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct QuickAccessApi {
     /// Adds a new icon to the quick access with the given texture identifiers.
@@ -319,7 +323,7 @@ pub struct QuickAccessApi {
     pub remove_context_menu: RawQuickAccessGeneric,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct LocalizationApi {
     /// Translates the identifier into the current active language.
@@ -334,7 +338,7 @@ pub struct LocalizationApi {
     pub set: RawLocalizationSet,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct FontApi {
     /// Requests a font to be sent to the given callback/receiver.
