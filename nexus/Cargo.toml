@@ -16,7 +16,7 @@ imgui = { package = "arcdps-imgui", version = "0.8.0", features = [
 ] }
 log = { version = "0.4.21", features = ["std"], optional = true }
 env_filter = { version = "0.1.2", optional = true }
-nexus_codegen = { path = "../nexus_codegen" }
+nexus_codegen = { path = "../nexus_codegen", optional = true }
 num_enum = "0.7.2"
 paste = "1.0.14"
 retour = { version = "0.3.1", optional = true }
@@ -29,9 +29,11 @@ version = "0.60.0"
 features = ["System", "Win32_Graphics_Dxgi", "Win32_Graphics_Direct3D11"]
 
 [features]
+default = ["export"]
+export = ["dep:nexus_codegen"]
 rtapi = ["dep:bitfields"]
 log = ["dep:log"]
-log_filter = ["log", "dep:env_filter", "nexus_codegen/log_filter"]
+log_filter = ["log", "dep:env_filter", "nexus_codegen?/log_filter"]
 arc = ["dep:arcdps"]
 arcdps = ["arc"]
 evtc = ["arc"]

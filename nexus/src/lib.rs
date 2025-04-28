@@ -38,6 +38,7 @@ pub use self::{
     revertible::Revertible,
 };
 pub use imgui;
+#[cfg(feature = "export")]
 pub use nexus_codegen::export;
 
 /// Returns the Nexus [`AddonApi`] instance.
