@@ -22,7 +22,7 @@ pub const MUMBLE_LINK: &str = "DL_MUMBLE_LINK";
 pub const NEXUS_LINK: &str = "DL_NEXUS_LINK";
 
 /// Nexus link data.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[repr(C)]
 pub struct NexusLink {

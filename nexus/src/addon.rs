@@ -5,7 +5,7 @@ use bitflags::bitflags;
 use std::ffi::c_char;
 
 /// Addon definition.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AddonDefinition {
     /// Raidcore addon id or random unique negative integer, if not on Raidcore.
@@ -57,7 +57,7 @@ pub type RawAddonLoad = unsafe extern "C-unwind" fn(api: *const AddonApi);
 pub type RawAddonUnload = unsafe extern "C-unwind" fn();
 
 /// Addon version.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[repr(C)]
 pub struct AddonVersion {
@@ -69,7 +69,7 @@ pub struct AddonVersion {
 
 bitflags! {
     /// Addon flags.
-    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
     pub struct AddonFlags: u32 {
         const None = 0;
