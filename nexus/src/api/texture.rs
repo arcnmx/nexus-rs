@@ -8,7 +8,6 @@ use std::{
     ffi::{c_char, c_void},
     mem,
     path::Path,
-    ptr::NonNull,
 };
 use windows::Win32::{Foundation::HMODULE, Graphics::Direct3D11::ID3D11ShaderResourceView};
 
@@ -25,7 +24,7 @@ pub struct Texture {
 
     /// Shader resource view of the texture.
     #[cfg_attr(feature = "serde", serde(skip))]
-    pub resource: ID3D11ShaderResourceView,
+    pub resource: Option<ID3D11ShaderResourceView>,
 }
 
 impl Texture {
@@ -33,8 +32,7 @@ impl Texture {
     #[inline]
     pub fn resource_ptr(&self) -> *const c_void {
         // ShaderResourceView is a IUnknown, which is is a NonNull<c_void>
-        unsafe { mem::transmute::<&ID3D11ShaderResourceView, &NonNull<c_void>>(&self.resource) }
-            .as_ptr()
+        unsafe { mem::transmute_copy::<Option<ID3D11ShaderResourceView>, *const c_void>(&self.resource) }
     }
 
     /// Returns the associated [`imgui::TextureId`].
