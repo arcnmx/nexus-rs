@@ -2,7 +2,7 @@ use crate::data_link::{get_resource, read_resource};
 use bitfields::bitfield;
 use std::ffi::c_char;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct RealTimeData {
     /// Game build number.
